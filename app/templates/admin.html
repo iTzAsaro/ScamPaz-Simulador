@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Administrador{% endblock %}
+{% block body_class %}bg-light{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="admin-header">
+        <span class="btn-refresh" id="connection-status" style="background: transparent; color: #00ffcc; border: none; font-size: 14px;">Conectado (SSE) ●</span>
+        <h1>Simulador de Permisos (Tracking Unificado)</h1>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>IP</th>
+                <th>Navegador (Info)</th>
+                <th>Acción / Permiso</th>
+                <th>Estado</th>
+                <th>Detalle Extraído</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-cuerpo">
+            {% if permisos %}
+                {% for p in permisos %}
+                <tr>
+                    <td>{{ p.nombre }}</td>
+                    <td>{{ p.ip }}</td>
+                    <td title="{{ p.user_agent }}">{{ p.user_agent[:20] }}...</td>
+                    <td>{{ p.tipo }}</td>
+                    <td>
+                        {% if p.estado == 'Concedido' %}
+                            <span style="color: #ff3366; font-weight: bold;">{{ p.estado }}</span>
+                        {% else %}
+                            <span style="color: #00ffcc; font-weight: bold;">{{ p.estado }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ p.detalle }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr id="fila-vacia">
+                    <td colspan="6" class="empty">No hay eventos registrados.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Limpiar intervalos residuales si quedó código de la versión anterior en caché
+    if (typeof autoRefreshInterval !== 'undefined' && autoRefreshInterval !== null) {
+        clearInterval(autoRefreshInterval);
+    }
+
+    const evtSource = new EventSource("/api/stream");
+    const statusText = document.getElementById('connection-status');
+
+    evtSource.onmessage = function(event) {
+        const nuevosRegistros = JSON.parse(event.data);
+        const tbody = document.getElementById('tabla-cuerpo');
+        
+        const vacia = document.getElementById('fila-vacia');
+        if (vacia) { vacia.remove(); }
+
+        nuevosRegistros.reverse().forEach(p => {
+            const tr = document.createElement('tr');
+            
+            const colorEstado = p.estado === 'Concedido' ? '#ff3366' : '#00ffcc';
+            const spanEstado = `<span style="color: ${colorEstado}; font-weight: bold;">${p.estado}</span>`;
+            const uaCorto = p.user_agent ? p.user_agent.substring(0, 20) + '...' : '...';
+
+            tr.innerHTML = `
+                <td>${p.nombre}</td>
+                <td>${p.ip}</td>
+                <td title="${p.user_agent}">${uaCorto}</td>
+                <td>${p.tipo}</td>
+                <td>${spanEstado}</td>
+                <td>${p.detalle}</td>
+            `;
+            
+            tr.style.animation = "flashRow 1.5s ease-out";
+            tbody.insertBefore(tr, tbody.firstChild);
+        });
+    };
+
+    evtSource.onerror = function(err) {
+        console.error("SSE desconectado", err);
+        statusText.style.color = "#ff3366";
+        statusText.innerText = "Desconectado ○";
+    };
+</script>
+
+<style>
+    @keyframes flashRow {
+        0% { background-color: rgba(0, 240, 255, 0.4); }
+        100% { background-color: transparent; }
+    }
+</style>
+{% endblock %}

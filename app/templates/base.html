@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skull.css') }}">
+</head>
+<body class="{% block body_class %}bg-gradient{% endblock %}">
+
+    {% block content %}
+    <div class="glass-card">
+        <h2>Verificación de Usuario</h2>
+        <p class="subtitle">Demostración educativa: qué datos expone una página web.</p>
+
+        <div class="form-group">
+            <label for="nombre">Nombre y Apellido</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
+        </div>
+
+        <div class="divider" style="margin-top: 20px; border-top: none; padding-top: 0;">
+            <h3>Simulador de Permisos</h3>
+            <p class="subtitle-small">Al hacer clic se registrará tu nombre, IP, navegador y la acción elegida.</p>
+
+            <button class="btn-primary btn-outline btn-space" onclick="pedirUbicacion()">1. Solicitar Ubicación</button>
+            <div id="resultado-ubicacion" class="alert-text"></div>
+
+            <button class="btn-primary btn-outline btn-space" onclick="pedirNotificaciones()">2. Solicitar Notificaciones</button>
+            <div id="resultado-notif" class="alert-text"></div>
+        </div>
+
+        {% block extra %}{% endblock %}
+    </div>
+    {% endblock %}
+
+    <!-- Pantalla Calavera ASCII Glitch Moderno -->
+    <div id="skull-overlay">
+        <div class="contenedor-craneo">
+<pre class="craneo-ascii craneo-principal">
+       ______
+    .-"      "-.
+   /            \
+  |              |
+  |,  .-.  .-.  ,|
+  | )(__/  \__)( |
+  |/     /\     \|
+  (_     ^^     _)
+   \__|IIIIII|__/
+    | \IIIIII/ |
+    \          /
+     `--------`</pre>
+
+<pre class="craneo-ascii glitch-1">
+       ______
+    .-"      "-.
+   /            \
+  |              |
+  |,  .-.  .-.  ,|
+  | )(__/  \__)( |
+  |/     /\     \|
+  (_     ^^     _)
+   \__|IIIIII|__/
+    | \IIIIII/ |
+    \          /
+     `--------`</pre>
+
+<pre class="craneo-ascii glitch-2">
+       ______
+    .-"      "-.
+   /            \
+  |              |
+  |,  .-.  .-.  ,|
+  | )(__/  \__)( |
+  |/     /\     \|
+  (_     ^^     _)
+   \__|IIIIII|__/
+    | \IIIIII/ |
+    \          /
+     `--------`</pre>
+        </div>
+        <div class="skull-text">DATOS INTERCEPTADOS</div>
+    </div>
+
+    {% block scripts %}
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% endblock %}
+
+</body>
+</html>

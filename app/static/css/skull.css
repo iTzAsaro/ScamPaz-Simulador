@@ -1,0 +1,100 @@
+/* --- Calavera ASCII Animada (Efecto Glitch Moderno) --- */
+#skull-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(5, 5, 10, 0.98); 
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: none; flex-direction: column; justify-content: center; align-items: center;
+}
+
+#skull-overlay.active {
+    display: flex;
+}
+
+.contenedor-craneo {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin-bottom: 20px;
+}
+
+/* El texto ASCII principal con <pre> */
+.craneo-ascii {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-family: monospace;
+    font-size: 16px;
+    line-height: 1.2;
+    text-align: center;
+    margin: 0; 
+    padding: 0;
+    background: transparent;
+    user-select: none;
+    overflow: hidden;
+}
+
+/* Base blanca */
+.craneo-principal {
+    color: #fff;
+    animation: flotar 1.5s ease-in-out infinite;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    z-index: 2;
+}
+
+/* Capas Glitch usando clip-path (más preciso que clip: rect) */
+.glitch-1, .glitch-2 {
+    opacity: 0.9;
+    z-index: 3;
+}
+
+.glitch-1 {
+    left: -4px;
+    color: #ff00c1;
+    animation: glitch-anim 0.25s infinite linear alternate-reverse, flotar 1.5s ease-in-out infinite;
+}
+
+.glitch-2 {
+    left: 4px;
+    color: #00fff0;
+    animation: glitch-anim2 0.3s infinite linear alternate-reverse, flotar 1.5s ease-in-out infinite;
+}
+
+.skull-text { 
+    font-size: 28px; font-weight: bold; letter-spacing: 5px; 
+    text-transform: uppercase; color: #ff3366; text-shadow: 0 0 15px #ff3366;
+    animation: text-flash 0.3s infinite;
+    font-family: monospace;
+    z-index: 4;
+}
+
+@keyframes flotar {
+    0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.2)); }
+    50% { transform: translateY(-8px); filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.6)); }
+}
+
+/* clip-path: inset(top right bottom left) */
+@keyframes glitch-anim {
+    0%   { clip-path: inset(10% 0 60% 0); }
+    20%  { clip-path: inset(80% 0 5% 0); }
+    40%  { clip-path: inset(30% 0 40% 0); }
+    60%  { clip-path: inset(70% 0 10% 0); }
+    80%  { clip-path: inset(15% 0 75% 0); }
+    100% { clip-path: inset(50% 0 30% 0); }
+}
+
+@keyframes glitch-anim2 {
+    0%   { clip-path: inset(60% 0 10% 0); }
+    20%  { clip-path: inset(15% 0 70% 0); }
+    40%  { clip-path: inset(80% 0 5% 0); }
+    60%  { clip-path: inset(20% 0 50% 0); }
+    80%  { clip-path: inset(40% 0 30% 0); }
+    100% { clip-path: inset(5% 0 80% 0); }
+}
+
+@keyframes text-flash {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.02); }
+}
