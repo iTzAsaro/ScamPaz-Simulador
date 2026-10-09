@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala de Espera</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skull.css') }}">
+    <style>
+        .grid-estudiantes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .estudiante-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+        }
+        .estudiante-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            background: #ccc;
+        }
+        #btn-trampa {
+            display: none;
+            background: var(--success-green);
+            color: #000;
+            font-size: 2rem;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 40px auto;
+            font-weight: bold;
+            box-shadow: 0 0 20px var(--success-green);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient" data-nombre="{{ nombre }}">
+
+    <div class="glass-card" id="espera-container">
+        <h2>Hola, {{ nombre }}</h2>
+        <p class="subtitle" id="subtitulo-espera">Esperando a la profe Paz para empezar...</p>
+        
+        <button id="btn-trampa" onclick="ejecutarAtaque('{{ nombre }}')">¡HAZ CLIC PARA JUGAR!</button>
+
+        <div class="grid-estudiantes" id="lista-estudiantes">
+            <!-- Renderizado desde SSE -->
+        </div>
+    </div>
+
+    
+    <div id="trampa-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(11, 16, 32, 0.95); z-index: 5000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;">
+        <div class="glass-card" style="margin-top: 0; border-color: var(--success-green); box-shadow: 0 0 40px rgba(57, 255, 136, 0.2);">
+            <div class="icon" style="text-shadow: 0 0 20px var(--success-green);">🎮</div>
+            <h2 style="color: var(--success-green);">Configurando Juego...</h2>
+            <p id="trampa-texto" style="font-size: 1.2rem; margin-top: 20px; color: var(--text-main); line-height: 1.5;"></p>
+            <div style="margin-top: 30px; width: 50px; height: 50px; border: 4px solid rgba(57, 255, 136, 0.3); border-top: 4px solid var(--success-green); border-radius: 50%; animation: spin 1s linear infinite; margin-left: auto; margin-right: auto;"></div>
+        </div>
+    </div>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+
+    <!-- Pantalla Calavera -->
+    <div id="skull-overlay">
+        <div class="contenedor-craneo">
+<pre class="craneo-ascii craneo-principal">
+       ______
+    .-"      "-.
+   /            \
+  |              |
+  |,  .-.  .-.  ,|
+  | )(__/  \__)( |
+  |/     /\     \|
+  (_     ^^     _)
+   \__|IIIIII|__/
+    | \IIIIII/ |
+    \          /
+     `--------`</pre>
+<pre class="craneo-ascii glitch-1">
+       ______
+    .-"      "-.
+   /            \
+  |              |
+  |,  .-.  .-.  ,|
+  | )(__/  \__)( |
+  |/     /\     \|
+  (_     ^^     _)
+   \__|IIIIII|__/
+    | \IIIIII/ |
+    \          /
+     `--------`</pre>
+<pre class="craneo-ascii glitch-2">
+       ______
+    .-"      "-.
+   /            \
+  |              |
+  |,  .-.  .-.  ,|
+  | )(__/  \__)( |
+  |/     /\     \|
+  (_     ^^     _)
+   \__|IIIIII|__/
+    | \IIIIII/ |
+    \          /
+     `--------`</pre>
+        </div>
+        <div class="skull-text">DATOS INTERCEPTADOS</div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/espera.js') }}"></script>
+</body>
+</html>

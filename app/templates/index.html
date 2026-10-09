@@ -1,8 +1,54 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unirse al Juego</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .camera-box {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 15px;
+        }
+        #videoElement {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        #canvasElement {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient">
+    <div class="glass-card">
+        <h2>Unirse a la Clase</h2>
+        <p class="subtitle">Ingresa tu nombre y tómate una foto.</p>
 
-{% block title %}Acceso Seguro{% endblock %}
-{% block body_class %}bg-gradient{% endblock %}
+        <div class="camera-box">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="canvasElement"></canvas>
+        </div>
+        <button id="btn-camera" class="btn-primary btn-outline btn-space" onclick="iniciarCamara()">Encender Cámara</button>
 
-{% block extra %}
-<a href="/" style="color: white; text-decoration: underline; font-size: 14px;">Volver al inicio</a>
-{% endblock %}
+        <div class="form-group" style="margin-top: 20px;">
+            <label for="nombre">Nombre o Apodo</label>
+            <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="pin">PIN de Seguridad (Para validar entrada)</label>
+            <input type="password" id="pin" placeholder="Ej: 1234" required>
+        </div>
+
+        <button class="btn-primary" onclick="unirseAlJuego()">Unirse</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/join.js') }}"></script>
+</body>
+</html>

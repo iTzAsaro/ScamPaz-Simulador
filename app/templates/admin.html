@@ -1,103 +1,80 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Profe Paz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .grid-estudiantes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .estudiante-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+        }
+        .estudiante-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            background: #ccc;
+        }
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .logs-table th, .logs-table td {
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px;
+            text-align: left;
+        }
+        .status-granted { color: var(--error-red); font-weight: bold; }
+        .status-denied { color: var(--success-green); font-weight: bold; }
+    </style>
+</head>
+<body class="bg-gradient">
+    <div class="glass-card" style="max-width: 1000px;">
+        <h2>Panel de Control - Profe Paz <button class="btn-primary btn-outline" onclick="reiniciarJuego()" style="float: right; padding: 10px; font-size: 14px;">Reiniciar Sala</button></h2>
+        
+        <div id="panel-lobby">
+            <h3>Estudiantes en la sala: <span id="contador">0</span></h3>
+            <div class="grid-estudiantes" id="lista-estudiantes"></div>
+            
+            <button class="btn-primary" onclick="empezarJuego()" style="background: var(--error-red); font-size: 1.2rem; padding: 15px 30px;">EMPEZAR</button>
+            
+            <a href="/admin/export" class="btn-primary btn-outline btn-space" style="margin-left: 10px; border-color: var(--success-green); color: var(--success-green); text-decoration: none; padding: 10px 20px; display: inline-block;">Descargar Reporte CSV</a>
+<button class="btn-primary btn-outline btn-space" onclick="reiniciarJuego()" style="margin-left: 10px;">Reiniciar Todo</button>
+        </div>
 
-{% block title %}Panel Administrador{% endblock %}
-{% block body_class %}bg-light{% endblock %}
-
-{% block content %}
-<div class="container">
-    <div class="admin-header">
-        <span class="btn-refresh" id="connection-status" style="background: transparent; color: #00ffcc; border: none; font-size: 14px;">Conectado (SSE) ●</span>
-        <h1>Simulador de Permisos (Tracking Unificado)</h1>
+        <div id="panel-logs" style="display: none; margin-top: 30px;">
+            <h3 style="color: var(--error-red);">⚡ Datos Interceptados en Tiempo Real</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Detalle</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-body">
+                    <!-- Eventos SSE -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>IP</th>
-                <th>Navegador (Info)</th>
-                <th>Acción / Permiso</th>
-                <th>Estado</th>
-                <th>Detalle Extraído</th>
-            </tr>
-        </thead>
-        <tbody id="tabla-cuerpo">
-            {% if permisos %}
-                {% for p in permisos %}
-                <tr>
-                    <td>{{ p.nombre }}</td>
-                    <td>{{ p.ip }}</td>
-                    <td title="{{ p.user_agent }}">{{ p.user_agent[:20] }}...</td>
-                    <td>{{ p.tipo }}</td>
-                    <td>
-                        {% if p.estado == 'Concedido' %}
-                            <span style="color: #ff3366; font-weight: bold;">{{ p.estado }}</span>
-                        {% else %}
-                            <span style="color: #00ffcc; font-weight: bold;">{{ p.estado }}</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ p.detalle }}</td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr id="fila-vacia">
-                    <td colspan="6" class="empty">No hay eventos registrados.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Limpiar intervalos residuales si quedó código de la versión anterior en caché
-    if (typeof autoRefreshInterval !== 'undefined' && autoRefreshInterval !== null) {
-        clearInterval(autoRefreshInterval);
-    }
-
-    const evtSource = new EventSource("/api/stream");
-    const statusText = document.getElementById('connection-status');
-
-    evtSource.onmessage = function(event) {
-        const nuevosRegistros = JSON.parse(event.data);
-        const tbody = document.getElementById('tabla-cuerpo');
-        
-        const vacia = document.getElementById('fila-vacia');
-        if (vacia) { vacia.remove(); }
-
-        nuevosRegistros.reverse().forEach(p => {
-            const tr = document.createElement('tr');
-            
-            const colorEstado = p.estado === 'Concedido' ? '#ff3366' : '#00ffcc';
-            const spanEstado = `<span style="color: ${colorEstado}; font-weight: bold;">${p.estado}</span>`;
-            const uaCorto = p.user_agent ? p.user_agent.substring(0, 20) + '...' : '...';
-
-            tr.innerHTML = `
-                <td>${p.nombre}</td>
-                <td>${p.ip}</td>
-                <td title="${p.user_agent}">${uaCorto}</td>
-                <td>${p.tipo}</td>
-                <td>${spanEstado}</td>
-                <td>${p.detalle}</td>
-            `;
-            
-            tr.style.animation = "flashRow 1.5s ease-out";
-            tbody.insertBefore(tr, tbody.firstChild);
-        });
-    };
-
-    evtSource.onerror = function(err) {
-        console.error("SSE desconectado", err);
-        statusText.style.color = "#ff3366";
-        statusText.innerText = "Desconectado ○";
-    };
-</script>
-
-<style>
-    @keyframes flashRow {
-        0% { background-color: rgba(0, 240, 255, 0.4); }
-        100% { background-color: transparent; }
-    }
-</style>
-{% endblock %}
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>
